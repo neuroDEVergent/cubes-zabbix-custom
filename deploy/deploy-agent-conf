@@ -14,33 +14,34 @@ for file in ../agent/*.conf; do
   echo "  ##########"
 	echo "  Installing $current_file...";
 
-	echo "Checking if file exists and / or needs to be updated...";
+	echo "  Checking if file exists and / or needs to be updated...";
 	if ! cmp -s ../agent/$current_file /etc/zabbix/zabbix_agentd.d/$current_file; then
-		echo "Files are not the same!";
-		echo "Installing / Updating file..."
+		echo "  Files are not the same!";
+		echo "  Installing / Updating file..."
 
 		if install -D --owner root --group zabbix -m 740 ../agent/$current_file               /etc/zabbix/zabbix_agentd.d/$current_file; then
-			echo "File updated successfully!";
+			echo "  File updated successfully!";
 			zbx_restart_flag=1;
 		else
-			echo "Failed to update the file";
+			echo "  Failed to update the file";
 		fi
 		
 	else
-		echo "File already exists!";
-		echo "Skipping..."
+		echo "  File already exists!";
+		echo "  Skipping..."
 		
 	fi
 
 done;
 
 if [[ $zbx_restart_flag -ne 0 ]]; then
+  echo "##########"
 	echo "Restarting zabbix-agent.service..."
 
 	if systemctl restart zabbix-agent.service; then
-		echo "Zabbix service restarted successfully!";
+		echo "  Zabbix service restarted successfully!";
 	else
-		echo "Zabbix service failed to restart.";
+		echo "  Zabbix service failed to restart.";
 	fi
 fi
 
