@@ -1,0 +1,22 @@
+zabbix_export:
+  version: '7.4'
+  template_groups:
+    - uuid: 7df96b18c230490a9a0a9e2307226338
+      name: Templates
+  templates:
+    - uuid: f4468d8046eb471aaffd49b21d047936
+      template: 'Cubes Custom'
+      name: 'Cubes Custom'
+      groups:
+        - name: Templates
+      items:
+        - uuid: f21828c9b98d4a5584a40c3f867e5c02
+          name: 'Missing fstab mounts'
+          key: fstab.mounts
+          value_type: TEXT
+          triggers:
+            - uuid: 004b094459404eb3b4aaccd06adecc81
+              expression: 'length(last(/Cubes Custom/fstab.mounts))>0'
+              name: 'Unmounted fstab entry detected'
+              priority: HIGH
+              description: 'The following fstab entry is not currently mounted: {ITEM.LASTVALUE1}'

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+findmnt --fstab --output TARGET --noheadings |
+while read -r target; do
+
+    # ignore swap entries
+    [ "$target" = "none" ] && continue
+
+    # check mount
+    if ! findmnt "$target" >/dev/null; then
+        echo "$target"
+    fi
+
+done
