@@ -6,15 +6,12 @@ cd "$parent_path"
 zbx_restart_flag=0;
 
 # Compare returns 0 if files are the same, so we skip install and reset if it's unecessary
-echo "##########";
+echo "-----"
 echo "Installing templates...";
-echo "";
 
 for file in ../agent/*.conf; do
 	current_file="${file##*/}";
-  echo "##########";
 	echo "Installing $current_file...";
-  echo "";
 
 	echo "Checking if file exists and / or needs to be updated...";
 	if ! cmp -s ../agent/$current_file /etc/zabbix/zabbix_agentd.d/$current_file; then
@@ -29,18 +26,14 @@ for file in ../agent/*.conf; do
 		fi
 		
 	else
-    echo ""
 		echo "File already exists!";
 		echo "Skipping..."
-    echo ""
 	fi
 
 done;
 
 if [[ $zbx_restart_flag -ne 0 ]]; then
-  echo "##########"
 	echo "Restarting zabbix-agent.service..."
-  echo ""
 
 	if systemctl restart zabbix-agent.service; then
 		echo "Zabbix service restarted successfully!";
@@ -50,6 +43,5 @@ if [[ $zbx_restart_flag -ne 0 ]]; then
 fi
 
 
-echo "";
 echo "Done!"
 echo "Exiting program..."
