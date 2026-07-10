@@ -1,0 +1,20 @@
+#!/bin/bash
+
+ssh openlitespeed << 'EOF'
+
+cd /tmp
+
+git clone https://github.com/neuroDEVergent/cubes-zabbix-custom
+
+cd cubes-zabbix-custom/deploy
+chmod +x deploy-agent-conf;
+chmod +x deploy-agent-scripts;
+
+./deploy-agent-conf
+./deploy-agent-scripts
+
+cd ..
+rm -rf /tmp/cubes-zabbix-custom
+exit
+
+EOF
