@@ -4,9 +4,11 @@ ssh openlitespeed << 'EOF'
 
 cd /tmp
 
-git clone https://github.com/neuroDEVergent/cubes-zabbix-custom
+wget https://github.com/neuroDEVergent/cubes-zabbix-custom/archive/refs/heads/main.tar.gz
+tar -xzf main.tar.gz
+rm main.tar.gz
 
-cd cubes-zabbix-custom/deploy
+cd cubes-zabbix-custom-main/deploy
 chmod +x deploy-agent-conf;
 chmod +x deploy-agent-scripts;
 
@@ -14,7 +16,7 @@ chmod +x deploy-agent-scripts;
 ./deploy-agent-scripts
 
 cd ..
-rm -rf /tmp/cubes-zabbix-custom
+rm -rf /tmp/cubes-zabbix-custom-main
 exit
 
 EOF

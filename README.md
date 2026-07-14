@@ -52,7 +52,7 @@ For every file in the directory do the following:
 ```deploy-all``` however is a bit different. It's meant to be run from one place which would like to install everything. It has a following sequence:
 
 1. ssh into a machine
-2. pull the git repo
+2. wget the tarball of the repo and extract it
 3. make deploy scripts executable
 4. execute them
 5. clean up space by deleting the repo
