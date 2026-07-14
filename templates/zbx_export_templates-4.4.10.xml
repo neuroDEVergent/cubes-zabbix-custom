@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2026-07-14T09:11:42Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Cubes Custom</template>
+            <name>Cubes Custom</name>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <items>
+                <item>
+                    <name>Missing fstab mounts</name>
+                    <key>fstab.mounts</key>
+                    <history>31d</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <description>Compares fstab entries to list of currently mount devices and outputs the difference</description>
+                    <triggers>
+                        <trigger>
+                            <expression>{strlen()}&gt;0</expression>
+                            <name>Unmounted fstab entry detected</name>
+                            <priority>HIGH</priority>
+                            <description>The following fstab entry is not currently mounted: {ITEM.LASTVALUE1}</description>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+        </template>
+    </templates>
+</zabbix_export>
