@@ -61,6 +61,10 @@ It's currently extremely simple and needs major improvements, so I will update t
 
 ## templates
 
-Contains custom template that needs to be imported on the *Zabbix server*. I researched about the way it could be easily deployed across multiple servers, it's possible to do so through curl POST requests, but it can vary from version to version of Zabbix, so I didn't bother thinking about it further. Since we don't have that many, it's not too big of a hassle to import templates manually, but we should think about making it easier in the future. 
+Contains custom template that needs to be imported on the *Zabbix server*. 
+
+Import option can be strict, but it's backwards compatible. So our template should always be compatible with oldest version of Zabbix server instance we have, which is 4.4 per my findings.
+
+I researched about the way it could be easily deployed across multiple servers, it's possible to do so through curl POST requests, but it can vary from version to version of Zabbix, so I didn't bother thinking about it further. Since we don't have that many, it's not too big of a hassle to import templates manually, but we should think about making it easier in the future. 
 
 After importing, it's necessary to add this custom template to desired hosts to start monitoring for custom metrics. So the template essentially contains items and triggers in one place. 
