@@ -1,11 +1,14 @@
 #!/bin/bash
 
+failed_hosts=();
+
 for host in $(cat $1); do
-  ssh -o ConnectTimeout=3 -o BatchMode=yes $host << 'EOF'
+  echo "Attempting to connect to $host..."
+  if ssh -q -o ConnectTimeout=3 -o BatchMode=yes $host << 'EOF'
 
   cd /tmp
 
-  wget https://github.com/neuroDEVergent/cubes-zabbix-custom/archive/refs/heads/main.tar.gz
+  wget --quiet https://github.com/neuroDEVergent/cubes-zabbix-custom/archive/refs/heads/main.tar.gz
   tar -xzf main.tar.gz
   rm main.tar.gz
 
@@ -21,4 +24,17 @@ for host in $(cat $1); do
   exit
 
 EOF
+ then
+  echo ""
+  echo "Finished working on $host"
+  echo ""
+
+else
+  echo "Connection to $host failed"
+  failed_hosts+=("$host");
+fi;
 done;
+
+echo ""
+echo "Connection failed for following hosts:"
+printf '%s\n' "${failed_hosts[@]}"
