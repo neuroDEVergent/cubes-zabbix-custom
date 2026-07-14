@@ -1,22 +1,24 @@
 #!/bin/bash
 
-ssh openlitespeed << 'EOF'
+for host in $(cat $1); do
+  ssh -o ConnectTimeout=3 -o BatchMode=yes $host << 'EOF'
 
-cd /tmp
+  cd /tmp
 
-wget https://github.com/neuroDEVergent/cubes-zabbix-custom/archive/refs/heads/main.tar.gz
-tar -xzf main.tar.gz
-rm main.tar.gz
+  wget https://github.com/neuroDEVergent/cubes-zabbix-custom/archive/refs/heads/main.tar.gz
+  tar -xzf main.tar.gz
+  rm main.tar.gz
 
-cd cubes-zabbix-custom-main/deploy
-chmod +x deploy-agent-conf;
-chmod +x deploy-agent-scripts;
+  cd cubes-zabbix-custom-main/deploy
+  chmod +x deploy-agent-conf;
+  chmod +x deploy-agent-scripts;
 
-./deploy-agent-conf
-./deploy-agent-scripts
+  ./deploy-agent-conf
+  ./deploy-agent-scripts
 
-cd ..
-rm -rf /tmp/cubes-zabbix-custom-main
-exit
+  cd ..
+  rm -rf /tmp/cubes-zabbix-custom-main
+  exit
 
 EOF
+done;
