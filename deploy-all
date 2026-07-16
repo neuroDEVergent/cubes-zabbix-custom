@@ -18,8 +18,8 @@ for host in $(cat $1/agents.txt); do
   chmod +x deploy-agent-conf;
   chmod +x deploy-agent-scripts;
 
-  ./deploy-agent-conf
-  ./deploy-agent-scripts
+  ./deploy-agent-conf $1
+  ./deploy-agent-scripts $1
 
   cd ..
   rm -rf /tmp/cubes-zabbix-custom-main
