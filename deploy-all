@@ -5,35 +5,37 @@ set -e # Stop executing if anything goes wrong
 zbx_restart_flag=0;
 
 failed_hosts=();
+successful_hosts=();
 
 for host in $(cat $1/agents.txt); do
+  echo "Copying files to $host..."
+  if scp -r ./$1/agent ./$1/scripts $host:/tmp/; then
+    echo "Files copied over successfully!"
+  else
+    echo "Secure copy failed!"
+    exit
+  fi
+
   echo "Attempting to connect to $host..."
   if ssh -q -o ConnectTimeout=3 -o BatchMode=yes $host bash -s -- "$1" << 'EOF'
 
-  cd /tmp
-
-  wget --quiet https://github.com/neuroDEVergent/cubes-zabbix-custom/archive/refs/heads/main.tar.gz
-  tar -xzf main.tar.gz
-  rm main.tar.gz
-
-  cd cubes-zabbix-custom-main/
-  chmod +x deploy-agent-conf;
-  chmod +x deploy-agent-scripts;
+  cd /tmp/
 
   echo "-----"
   echo "Installing config files...";
   echo ""
 
-  for file in $1/agent/*.conf; do
+  for file in agent/*.conf; do
     current_file="${file##*/}";
+
     echo "Installing $current_file...";
 
     echo "Checking if file exists and / or needs to be updated...";
-    if ! cmp -s $1/agent/$current_file /etc/zabbix/zabbix_agentd.d/$current_file; then
+    if ! cmp -s /agent/$current_file /etc/zabbix/zabbix_agentd.d/$current_file; then
       echo "Files are not the same!";
       echo "Installing / Updating file...";
 
-      if install -D --owner root --group zabbix -m 740 $1/agent/$current_file               /etc/zabbix/zabbix_agentd.d/$current_file; then
+      if install -D --owner root --group zabbix -m 740 agent/$current_file               /etc/zabbix/zabbix_agentd.d/$current_file; then
         echo "File updated successfully!";
         zbx_restart_flag=1;
       else
@@ -53,16 +55,16 @@ for host in $(cat $1/agents.txt); do
   echo "Installing scripts...";
   echo ""
 
-  for file in $1/scripts/*; do
+  for file in scripts/*; do
     current_file="${file##*/}";
     echo "Installing $current_file...";
 
     echo "Checking if script exists and / or needs to be updated...";
-    if ! cmp -s $1/scripts/$current_file /usr/local/bin/$current_file; then
+    if ! cmp -s scripts/$current_file /usr/local/bin/$current_file; then
       echo "Files are not the same!";
       echo "Installing / Updating the script..."
 
-      if install -D --owner root --group zabbix -m 750 $1/scripts/$current_file /usr/local/bin/$current_file; then
+      if install -D --owner root --group zabbix -m 750 scripts/$current_file /usr/local/bin/$current_file; then
         echo "Script updated successfully!";
         zbx_restart_flag=1;
       else
@@ -82,6 +84,7 @@ for host in $(cat $1/agents.txt); do
     echo ""
     if systemctl restart zabbix-agent.service; then
       echo "Zabbix service restarted successfully!";
+      successful_hosts+=("$host");
     else
       echo "Zabbix service failed to restart.";
     fi
@@ -91,7 +94,8 @@ for host in $(cat $1/agents.txt); do
   echo "Exiting program..."
 
   cd ..
-  rm -rf /tmp/cubes-zabbix-custom-main
+  rm -rf /tmp/agent
+  rm -rf /tmp/scripts
   exit
 
 EOF
@@ -105,6 +109,10 @@ else
   failed_hosts+=("$host");
 fi;
 done;
+
+echo ""
+echo "Successfully updated hosts:"
+printf '%s\n' "${successful_hosts[@]}"
 
 echo ""
 echo "Connection failed for following hosts:"
