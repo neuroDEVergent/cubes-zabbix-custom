@@ -10,16 +10,16 @@ echo "-----"
 echo "Installing config files...";
 echo ""
 
-for file in ../agent/*.conf; do
+for file in ../$1/agent/*.conf; do
 	current_file="${file##*/}";
 	echo "Installing $current_file...";
 
 	echo "Checking if file exists and / or needs to be updated...";
-	if ! cmp -s ../agent/$current_file /etc/zabbix/zabbix_agentd.d/$current_file; then
+	if ! cmp -s ../$1/agent/$current_file /etc/zabbix/zabbix_agentd.d/$current_file; then
 		echo "Files are not the same!";
 		echo "Installing / Updating file...";
 
-		if install -D --owner root --group zabbix -m 740 ../agent/$current_file               /etc/zabbix/zabbix_agentd.d/$current_file; then
+		if install -D --owner root --group zabbix -m 740 ../$1/agent/$current_file               /etc/zabbix/zabbix_agentd.d/$current_file; then
 			echo "File updated successfully!";
 			zbx_restart_flag=1;
 		else

@@ -1,8 +1,10 @@
 #!/bin/bash
 
+set -e # Stop executing if anything goes wrong
+
 failed_hosts=();
 
-for host in $(cat $1); do
+for host in $(cat $1/agents.txt); do
   echo "Attempting to connect to $host..."
   if ssh -q -o ConnectTimeout=3 -o BatchMode=yes $host << 'EOF'
 
