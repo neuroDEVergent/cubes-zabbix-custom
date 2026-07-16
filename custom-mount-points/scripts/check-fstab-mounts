@@ -1,6 +1,6 @@
 #!/bin/bash
 
-findmnt --fstab --output TARGET --noheadings |
+findmnt --fstab --output TARGET --noheadings | grep -vE '^/(boot|boot/efi|media/cdrom.*|proc|sys|dev|run|)$' |
 while read -r target; do
 
     # ignore swap entries
