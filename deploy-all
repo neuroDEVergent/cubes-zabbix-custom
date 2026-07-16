@@ -14,7 +14,7 @@ for host in $(cat $1/agents.txt); do
   tar -xzf main.tar.gz
   rm main.tar.gz
 
-  cd cubes-zabbix-custom-main/deploy
+  cd cubes-zabbix-custom-main/
   chmod +x deploy-agent-conf;
   chmod +x deploy-agent-scripts;
 
