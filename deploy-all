@@ -2,6 +2,8 @@
 
 set -e # Stop executing if anything goes wrong
 
+zbx_restart_flag=0;
+
 failed_hosts=();
 
 for host in $(cat $1/agents.txt); do
@@ -18,8 +20,73 @@ for host in $(cat $1/agents.txt); do
   chmod +x deploy-agent-conf;
   chmod +x deploy-agent-scripts;
 
-  ./deploy-agent-conf $1
-  ./deploy-agent-scripts $1
+  echo "-----"
+  echo "Installing config files...";
+  echo ""
+
+  for file in $1/agent/*.conf; do
+    current_file="${file##*/}";
+    echo "Installing $current_file...";
+
+    echo "Checking if file exists and / or needs to be updated...";
+    if ! cmp -s $1/agent/$current_file /etc/zabbix/zabbix_agentd.d/$current_file; then
+      echo "Files are not the same!";
+      echo "Installing / Updating file...";
+
+      if install -D --owner root --group zabbix -m 740 $1/agent/$current_file               /etc/zabbix/zabbix_agentd.d/$current_file; then
+        echo "File updated successfully!";
+        zbx_restart_flag=1;
+      else
+        echo "Failed to update the file";
+      fi
+      
+    else
+      echo "File already exists!";
+      echo "Skipping..."
+    fi
+
+  done;
+
+  echo "Done!"
+
+  echo "-----"
+  echo "Installing scripts...";
+  echo ""
+
+  for file in $1/scripts/*; do
+    current_file="${file##*/}";
+    echo "Installing $current_file...";
+
+    echo "Checking if script exists and / or needs to be updated...";
+    if ! cmp -s $1/scripts/$current_file /usr/local/bin/$current_file; then
+      echo "Files are not the same!";
+      echo "Installing / Updating the script..."
+
+      if install -D --owner root --group zabbix -m 750 $1/scripts/$current_file /usr/local/bin/$current_file; then
+        echo "Script updated successfully!";
+        zbx_restart_flag=1;
+      else
+        echo "Failed to update the script";
+      fi
+      
+    else
+      echo "File already exists!";
+      echo "Skipping..."
+    fi
+
+  done;
+
+  if [[ $zbx_restart_flag -ne 0 ]]; then
+    echo "Restarting zabbix-agent.service..."
+    if systemctl restart zabbix-agent.service; then
+      echo "Zabbix service restarted successfully!";
+    else
+      echo "Zabbix service failed to restart.";
+    fi
+  fi
+
+  echo "Done!"
+  echo "Exiting program..."
 
   cd ..
   rm -rf /tmp/cubes-zabbix-custom-main
