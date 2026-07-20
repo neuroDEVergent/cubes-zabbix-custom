@@ -1,12 +1,11 @@
 #!/bin/bash
 
-findmnt --fstab --output TARGET --noheadings | grep -vE '^/(boot|boot/efi|media/cdrom.*|proc|sys|dev|run|)$' |
+findmnt --fstab --output TARGET --noheadings |
+grep -vE '^/(boot|boot/efi|media/cdrom.*|proc|sys|dev|run|var/cache/nginx|)$' |
 while read -r target; do
 
-    # ignore swap entries
     [ "$target" = "none" ] && continue
 
-    # check mount
     if ! findmnt "$target" >/dev/null; then
         echo "$target"
     fi
